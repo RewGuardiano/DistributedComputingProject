@@ -31,12 +31,16 @@ class EchoServerThread implements Runnable {
     }
 
     private void handleClientRequest(String message) {
-        String[] parts = message.split(" ", 2);
+        String[] parts = message.split(" ", 3); // Now expecting LOGIN username password
         String command = parts[0].toUpperCase();
 
         switch (command) {
             case "LOGIN":
-                handleLogin(parts.length > 1 ? parts[1] : "anonymous");
+                if (parts.length == 3) {
+                    handleLogin(parts[1], parts[2]);
+                } else {
+                    output.println("102 LOGIN FAILED"); // Fail if username or password is missing
+                }
                 break;
             case "UPLOAD":
                 handleUpload(parts.length > 1 ? parts[1] : "");
@@ -52,9 +56,9 @@ class EchoServerThread implements Runnable {
         }
     }
 
-    private void handleLogin(String username) {
+    private void handleLogin(String username, String password) {
         userMessages.putIfAbsent(username, new ArrayList<>());
-        output.println("101 LOGIN SUCCESS");
+        output.println("101 LOGIN SUCCESS"); // Password is not verified but accepted
     }
 
     private void handleUpload(String message) {
@@ -63,18 +67,14 @@ class EchoServerThread implements Runnable {
             return;
         }
 
-        // Ensure the user has an entry in the message store
+        // Ensure the user has an entry in the message store (for now, it's anonymous)
         userMessages.putIfAbsent("anonymous", new ArrayList<>());
-
-        // Add the message to the user's message list
         userMessages.get("anonymous").add(message);
 
         // Print message on the server console
         System.out.println("Message received from client: " + message);
-
         output.println("201 UPLOAD SUCCESS");
     }
-
 
     private void handleDownload() {
         List<String> messages = userMessages.getOrDefault("anonymous", new ArrayList<>());
@@ -88,6 +88,7 @@ class EchoServerThread implements Runnable {
     }
 
     private void handleLogoff() {
+        System.out.println("Client has logged off.");
         output.println("401 LOGOFF SUCCESS");
     }
 }
