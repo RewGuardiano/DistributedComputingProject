@@ -13,8 +13,10 @@ class EchoServerThread implements Runnable {
     private static ConcurrentHashMap<String, List<Message>> userMessages = new ConcurrentHashMap<>();
     private static int messageIdCounter = 0;
 
+
     EchoServerThread(Socket socket) {
         this.clientSocket = socket;
+        System.out.println("New client connected via SSL.");
     }
 
     public void run() {

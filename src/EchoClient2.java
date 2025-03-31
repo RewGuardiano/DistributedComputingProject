@@ -119,9 +119,9 @@ public class EchoClient2 {
    private void connectToServer() {
       try {
          helper = new EchoClientHelper2("localhost", "12345");
-         outputArea.append("Connected to SMP Server.\n");
+         outputArea.append("Connected to SMP Server with SSL.\n");
       } catch (Exception e) {
-         outputArea.append("Error connecting to server.\n");
+         outputArea.append("Error connecting to server: " + e.getMessage() + "\n");
       }
    }
 

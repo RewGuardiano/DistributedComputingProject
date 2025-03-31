@@ -1,22 +1,43 @@
 import java.net.*;
 import java.io.*;
+import javax.net.ssl.*;
+import java.security.*;
+import java.io.FileInputStream;
 
-/**
- * SMP Client Helper using stream-mode socket.
- */
 public class EchoClientHelper2 {
    private MyStreamSocket mySocket;
    private InetAddress serverHost;
    private int serverPort;
 
-   EchoClientHelper2(String hostName, String portNum) throws SocketException, UnknownHostException, IOException {
+   EchoClientHelper2(String hostName, String portNum) throws Exception {
       this.serverHost = InetAddress.getByName(hostName);
       this.serverPort = Integer.parseInt(portNum);
-      this.mySocket = new MyStreamSocket(this.serverHost, this.serverPort);
-      System.out.println("Connected to SMP Server.");
+
+      // Initialize SSL context
+      SSLSocketFactory sslSocketFactory = getSSLSocketFactory();
+      SSLSocket sslSocket = (SSLSocket) sslSocketFactory.createSocket(this.serverHost, this.serverPort);
+
+      this.mySocket = new MyStreamSocket(sslSocket);
+      System.out.println("Connected to SMP Server with SSL.");
    }
 
-   // For single-line responses (e.g., LOGIN, UPLOAD, DOWNLOAD_INDEX, LOGOFF)
+   private SSLSocketFactory getSSLSocketFactory() throws Exception {
+      // Load the truststore
+      char[] truststorePassword = "admin123".toCharArray(); // Replace with your truststore password
+      KeyStore trustStore = KeyStore.getInstance("JKS");
+      trustStore.load(new FileInputStream("clienttruststore.jks"), truststorePassword);
+
+      // Initialize TrustManagerFactory
+      TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+      trustManagerFactory.init(trustStore);
+
+      // Initialize SSLContext
+      SSLContext sslContext = SSLContext.getInstance("TLS");
+      sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
+
+      return sslContext.getSocketFactory();
+   }
+
    public String sendRequest(String message) throws IOException {
       mySocket.sendMessage(message);
       return mySocket.receiveMessage();
@@ -29,7 +50,7 @@ public class EchoClientHelper2 {
       while ((line = mySocket.receiveMessage()) != null) {
          response.append(line).append("\n");
          if (line.startsWith("Message")) {
-            break; // Stop reading after the end signal
+            break;
          }
       }
       return response.toString();
