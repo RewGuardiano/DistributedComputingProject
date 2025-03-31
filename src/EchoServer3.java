@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class EchoServer3 {
    private static final int SERVER_PORT = 12345;
-   private static ConcurrentHashMap<String, List<String>> userMessages = new ConcurrentHashMap<>();
+   private static ConcurrentHashMap<String, List<Message>> userMessages = new ConcurrentHashMap<>();
 
    public static void main(String[] args) {
       try (ServerSocket myConnectionSocket = new ServerSocket(SERVER_PORT)) {

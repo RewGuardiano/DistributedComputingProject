@@ -16,13 +16,26 @@ public class EchoClientHelper2 {
       System.out.println("Connected to SMP Server.");
    }
 
+   // For single-line responses (e.g., LOGIN, UPLOAD, DOWNLOAD_INDEX, LOGOFF)
    public String sendRequest(String message) throws IOException {
       mySocket.sendMessage(message);
       return mySocket.receiveMessage();
    }
 
+   public String sendRequestMultiLine(String message) throws IOException {
+      mySocket.sendMessage(message);
+      StringBuilder response = new StringBuilder();
+      String line;
+      while ((line = mySocket.receiveMessage()) != null) {
+         response.append(line).append("\n");
+         if (line.startsWith("Message")) {
+            break; // Stop reading after the end signal
+         }
+      }
+      return response.toString();
+   }
+
    public void done() throws IOException {
-      mySocket.sendMessage("LOGOFF");
       mySocket.close();
    }
 }
