@@ -1,7 +1,6 @@
 import java.net.*;
 import java.io.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.ArrayList;
 import java.util.List;
 import javax.net.ssl.*;
 import java.security.*;
@@ -32,19 +31,27 @@ public class EchoServer3 {
    }
 
    private static SSLServerSocketFactory getSSLServerSocketFactory() throws Exception {
-      // Load the keystore
-      char[] keystorePassword = "admin123".toCharArray();
-      KeyStore keyStore = KeyStore.getInstance("JKS");
-      keyStore.load(new FileInputStream("serverkeystore.jks"), keystorePassword);
+      //Load Keystore
+      try {
+         char[] keystorePassword = "admin123".toCharArray();
+         KeyStore keyStore = KeyStore.getInstance("JKS");
+         try {
+            keyStore.load(new FileInputStream("serverkeystore.jks"), keystorePassword);
+         } catch (FileNotFoundException e) {
+            throw new Exception("Server keystore file not found: serverkeystore.jks", e);
+         } catch (IOException e) {
+            throw new Exception("Failed to load server keystore (possible wrong password): " + e.getMessage(), e);
+         }
 
-      // Initialize KeyManagerFactory
-      KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-      keyManagerFactory.init(keyStore, keystorePassword);
+         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+         keyManagerFactory.init(keyStore, keystorePassword);
 
-      // Initialize SSLContext
-      SSLContext sslContext = SSLContext.getInstance("TLS");
-      sslContext.init(keyManagerFactory.getKeyManagers(), null, null);
+         SSLContext sslContext = SSLContext.getInstance("TLS");
+         sslContext.init(keyManagerFactory.getKeyManagers(), null, null);
 
-      return sslContext.getServerSocketFactory();
+         return sslContext.getServerSocketFactory();
+      } catch (Exception e) {
+         throw new Exception("Failed to initialize SSL server socket factory: " + e.getMessage(), e);
+      }
    }
 }

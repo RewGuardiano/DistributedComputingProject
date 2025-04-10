@@ -12,10 +12,11 @@ class EchoServerThread implements Runnable {
     private PrintWriter output;
     private static ConcurrentHashMap<String, List<Message>> userMessages = new ConcurrentHashMap<>();
     private static int messageIdCounter = 0;
-
+    private boolean isLoggedIn; // Track login state for this client session
 
     EchoServerThread(Socket socket) {
         this.clientSocket = socket;
+        this.isLoggedIn = false; // Initialize login state
         System.out.println("New client connected via SSL.");
     }
 
@@ -43,39 +44,48 @@ class EchoServerThread implements Runnable {
     }
 
     private void handleClientRequest(String message) {
-        // Split the message into command and the rest (allowing spaces in the rest)
-        String[] parts = message.split(" ", 2); // Split into at most 2 parts: command and the rest
+        String[] parts = message.split(" ", 2);
         String command = parts[0].toUpperCase();
-        String argument = parts.length > 1 ? parts[1] : ""; // The rest of the message (may contain spaces)
+        String argument = parts.length > 1 ? parts[1] : "";
+
+        // Allow LOGIN command regardless of login state
+        if (command.equals("LOGIN")) {
+            String[] loginParts = argument.split(" ", 2);
+            if (loginParts.length == 2) {
+                handleLogin(loginParts[0], loginParts[1]);
+            } else {
+                output.println("102 LOGIN FAILED (Missing username or password)");
+            }
+            return;
+        }
+
+        // For all other commands, check if the client is logged in
+        if (!isLoggedIn) {
+            output.println("103 NOT LOGGED IN");
+            return;
+        }
 
         switch (command) {
-            case "LOGIN":
-                // LOGIN requires username and password, so split the argument further
-                String[] loginParts = argument.split(" ", 2);
-                if (loginParts.length == 2) {
-                    handleLogin(loginParts[0], loginParts[1]);
-                } else {
-                    output.println("102 LOGIN FAILED (Missing username or password)");
-                }
-                break;
             case "UPLOAD":
-                handleUpload(argument); // Pass the entire message (including spaces)
+                handleUpload(argument);
                 break;
             case "DOWNLOAD":
                 handleDownload();
                 break;
             case "DOWNLOAD_ID":
-                if (!argument.isEmpty()) {
-                    handleDownloadSpecific(argument);
-                } else {
+                if (argument.isEmpty()) {
                     output.println("403 INVALID REQUEST (Provide message ID)");
+                } else if (!argument.matches("d\\d+")) {
+                    output.println("405 INVALID MESSAGE ID FORMAT (Expected format: d followed by a number, e.g., d0)");
+                } else {
+                    handleDownloadSpecific(argument);
                 }
                 break;
             case "LOGOFF":
                 handleLogoff();
                 break;
             default:
-                output.println("400 INVALID REQUEST");
+                output.println("INVALID REQUEST");
         }
     }
 
@@ -94,11 +104,12 @@ class EchoServerThread implements Runnable {
         if (!found) {
             output.println("404 MESSAGE NOT FOUND");
         }
-        output.println("Message Downloaded"); // Add this line to indicate download completion
+        output.println("Message Downloaded");
     }
 
     private void handleLogin(String username, String password) {
         userMessages.putIfAbsent(username, new ArrayList<>());
+        isLoggedIn = true; // Set login state to true
         output.println("101 LOGIN SUCCESS");
     }
 
@@ -109,7 +120,7 @@ class EchoServerThread implements Runnable {
         }
 
         userMessages.putIfAbsent("anonymous", new ArrayList<>());
-        String messageId = "m" + messageIdCounter++;
+        String messageId = "d" + messageIdCounter++;
         Message newMessage = new Message(messageId, message);
         userMessages.get("anonymous").add(newMessage);
 
@@ -133,6 +144,7 @@ class EchoServerThread implements Runnable {
         try {
             System.out.println("Client has logged off.");
             output.println("401 LOGOFF SUCCESS");
+            isLoggedIn = false; // Reset login state
             clientSocket.close();
         } catch (IOException e) {
             System.err.println("Error closing client socket: " + e.getMessage());

@@ -21,6 +21,25 @@ public class EchoClientHelper2 {
       System.out.println("Connected to SMP Server with SSL.");
    }
 
+   public String sendRequest(String message) throws IOException {
+      mySocket.sendMessage(message);
+      return mySocket.receiveMessage();
+   }
+
+   public String sendRequestMultiLine(String message) throws IOException {
+      mySocket.sendMessage(message);
+      StringBuilder response = new StringBuilder();
+      String line;
+      while ((line = mySocket.receiveMessage()) != null) {
+         response.append(line).append("\n");
+         // Exit the loop if the response is a termination message
+         if (line.startsWith("302 NO MESSAGES") || line.startsWith("Message Downloaded")) {
+            break;
+         }
+      }
+      return response.toString();
+   }
+
    private SSLSocketFactory getSSLSocketFactory() throws Exception {
       // Load the truststore
       char[] truststorePassword = "admin123".toCharArray(); // Replace with your truststore password
@@ -36,24 +55,6 @@ public class EchoClientHelper2 {
       sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
 
       return sslContext.getSocketFactory();
-   }
-
-   public String sendRequest(String message) throws IOException {
-      mySocket.sendMessage(message);
-      return mySocket.receiveMessage();
-   }
-
-   public String sendRequestMultiLine(String message) throws IOException {
-      mySocket.sendMessage(message);
-      StringBuilder response = new StringBuilder();
-      String line;
-      while ((line = mySocket.receiveMessage()) != null) {
-         response.append(line).append("\n");
-         if (line.startsWith("Message")) {
-            break;
-         }
-      }
-      return response.toString();
    }
 
    public void done() throws IOException {
