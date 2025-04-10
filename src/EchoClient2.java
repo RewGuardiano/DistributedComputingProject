@@ -1,25 +1,26 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 
 /**
  * SMP Client GUI using Swing
  */
 public class EchoClient2 {
-   private JTextField messageIdField;
-   private JButton downloadSpecificButton;
-   private JButton getAllMessageIdsButton;
+   private final JTextField messageIdField;
+   private final JButton downloadSpecificButton;
+   private final JButton getAllMessageIdsButton;
    private EchoClientHelper2 helper;
-   private JFrame frame;
-   private JTextField usernameField, passwordField, messageField;
-   private JTextArea outputArea;
-   private JButton loginButton, uploadButton, downloadButton, logoffButton;
+    private final JTextField usernameField;
+    private final JTextField passwordField;
+    private final JTextField messageField;
+   private final JTextArea outputArea;
+    private final JButton uploadButton;
+    private final JButton downloadButton;
+    private final JButton logoffButton;
    private boolean isLoggedIn; // Track login state
 
    public EchoClient2() {
-      frame = new JFrame("SMP Client");
+       JFrame frame = new JFrame("SMP Client");
       frame.setSize(600, 600);
       frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       frame.setLayout(new BorderLayout(10, 10));
@@ -32,7 +33,7 @@ public class EchoClient2 {
       loginPanel.add(new JLabel("Password:"));
       passwordField = new JPasswordField();
       loginPanel.add(passwordField);
-      loginButton = new JButton("Login");
+       JButton loginButton = new JButton("Login");
       loginPanel.add(loginButton);
       frame.add(loginPanel, BorderLayout.NORTH);
 
@@ -81,41 +82,17 @@ public class EchoClient2 {
       isLoggedIn = false;
       setActionButtonsEnabled(false);
 
-      downloadSpecificButton.addActionListener(new ActionListener() {
-         public void actionPerformed(ActionEvent e) {
-            downloadSpecificMessage();
-         }
-      });
+      downloadSpecificButton.addActionListener(e -> downloadSpecificMessage());
 
-      getAllMessageIdsButton.addActionListener(new ActionListener() {
-         public void actionPerformed(ActionEvent e) {
-            getAllMessageIds();
-         }
-      });
+      getAllMessageIdsButton.addActionListener(e -> getAllMessageIds());
 
-      loginButton.addActionListener(new ActionListener() {
-         public void actionPerformed(ActionEvent e) {
-            login();
-         }
-      });
+      loginButton.addActionListener(e -> login());
 
-      uploadButton.addActionListener(new ActionListener() {
-         public void actionPerformed(ActionEvent e) {
-            uploadMessage();
-         }
-      });
+      uploadButton.addActionListener(e -> uploadMessage());
 
-      downloadButton.addActionListener(new ActionListener() {
-         public void actionPerformed(ActionEvent e) {
-            downloadMessages();
-         }
-      });
+      downloadButton.addActionListener(e -> downloadMessages());
 
-      logoffButton.addActionListener(new ActionListener() {
-         public void actionPerformed(ActionEvent e) {
-            logoff();
-         }
-      });
+      logoffButton.addActionListener(e -> logoff());
 
       frame.setVisible(true);
       connectToServer();
@@ -246,7 +223,6 @@ public class EchoClient2 {
          if (response.startsWith("401 LOGOFF SUCCESS")) {
             isLoggedIn = false;
             setActionButtonsEnabled(false);
-            outputArea.append("Logged off successfully. Please log in again to continue.\n");
          }
          helper.done();
       } catch (java.net.SocketException e) {

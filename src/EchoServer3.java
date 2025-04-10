@@ -1,16 +1,13 @@
 import java.net.*;
 import java.io.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.List;
 import javax.net.ssl.*;
 import java.security.*;
 import java.io.FileInputStream;
 
 public class EchoServer3 {
    private static final int SERVER_PORT = 12345;
-   private static ConcurrentHashMap<String, List<Message>> userMessages = new ConcurrentHashMap<>();
 
-   public static void main(String[] args) {
+    public static void main(String[] args) {
       try {
          // Initialize SSL context
          SSLServerSocketFactory sslServerSocketFactory = getSSLServerSocketFactory();
@@ -23,8 +20,6 @@ public class EchoServer3 {
                new Thread(new EchoServerThread(clientSocket)).start();
             }
          }
-      } catch (IOException e) {
-         e.printStackTrace();
       } catch (Exception e) {
          e.printStackTrace();
       }

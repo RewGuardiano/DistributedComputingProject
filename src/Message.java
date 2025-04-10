@@ -2,8 +2,8 @@
  * Represents a message with a unique ID and content.
  */
 class Message {
-    private String id;
-    private String content;
+    private final String id;
+    private final String content;
 
     public Message(String id, String content) {
         this.id = id;

@@ -5,17 +5,15 @@ import java.security.*;
 import java.io.FileInputStream;
 
 public class EchoClientHelper2 {
-   private MyStreamSocket mySocket;
-   private InetAddress serverHost;
-   private int serverPort;
+   private final MyStreamSocket mySocket;
 
-   EchoClientHelper2(String hostName, String portNum) throws Exception {
-      this.serverHost = InetAddress.getByName(hostName);
-      this.serverPort = Integer.parseInt(portNum);
+    EchoClientHelper2(String hostName, String portNum) throws Exception {
+       InetAddress serverHost = InetAddress.getByName(hostName);
+        int serverPort = Integer.parseInt(portNum);
 
       // Initialize SSL context
       SSLSocketFactory sslSocketFactory = getSSLSocketFactory();
-      SSLSocket sslSocket = (SSLSocket) sslSocketFactory.createSocket(this.serverHost, this.serverPort);
+      SSLSocket sslSocket = (SSLSocket) sslSocketFactory.createSocket(serverHost, serverPort);
 
       this.mySocket = new MyStreamSocket(sslSocket);
       System.out.println("Connected to SMP Server with SSL.");

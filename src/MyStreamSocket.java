@@ -2,7 +2,7 @@ import java.net.*;
 import java.io.*;
 
 public class MyStreamSocket extends Socket {
-   private Socket socket;
+   private final Socket socket;
    private BufferedReader input;
    private PrintWriter output;
 
@@ -23,14 +23,13 @@ public class MyStreamSocket extends Socket {
       output = new PrintWriter(new OutputStreamWriter(outStream));
    }
 
-   public void sendMessage(String message) throws IOException {
+   public void sendMessage(String message) {
       output.print(message + "\n");
       output.flush();
    }
 
    public String receiveMessage() throws IOException {
-      String message = input.readLine();
-      return message;
+       return input.readLine();
    }
 
    public void close() throws IOException {

@@ -7,10 +7,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * Thread handling a single client session for the SMP server.
  */
 class EchoServerThread implements Runnable {
-    private Socket clientSocket;
-    private BufferedReader input;
+    private final Socket clientSocket;
     private PrintWriter output;
-    private static ConcurrentHashMap<String, List<Message>> userMessages = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, List<Message>> userMessages = new ConcurrentHashMap<>();
     private static int messageIdCounter = 0;
     private boolean isLoggedIn; // Track login state for this client session
 
@@ -22,7 +21,7 @@ class EchoServerThread implements Runnable {
 
     public void run() {
         try {
-            input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            BufferedReader input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             output = new PrintWriter(clientSocket.getOutputStream(), true);
 
             String clientMessage;
