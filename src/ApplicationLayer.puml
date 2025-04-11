@@ -1,0 +1,74 @@
+@startuml ApplicationLayer
+
+' Define classes
+class EchoServerThread {
+  -clientSocket: Socket
+  -output: PrintWriter
+  -userMessages: ConcurrentHashMap<String, List<Message>>
+  -messageIdCounter: int
+  -isLoggedIn: boolean
+  +EchoServerThread(socket: Socket)
+  +run(): void
+  -handleClientRequest(message: String): void
+  -handleDownloadSpecific(messageId: String): void
+  -handleLogin(username: String, password: String): void
+  -handleUpload(message: String): void
+  -handleDownload(): void
+  -handleLogoff(): void
+}
+
+class EchoServer3 {
+  -SERVER_PORT: int = 12345
+  +main(args: String[]): void
+  -getSSLServerSocketFactory(): SSLServerSocketFactory
+}
+
+class Message {
+  -id: String
+  -content: String
+  +Message(id: String, content: String)
+  +getId(): String
+  +getContent(): String
+  +toString(): String
+}
+
+class EchoClientHelper2 {
+  -mySocket: MyStreamSocket
+  +EchoClientHelper2(hostName: String, portNum: String)
+  +sendRequest(message: String): String
+  +sendRequestMultiLine(message: String): String
+  -getSSLSocketFactory(): SSLSocketFactory
+  +done(): void
+}
+
+class EchoClient2 {
+  -usernameField: JTextField
+  -passwordField: JTextField
+  -messageField: JTextField
+  -messageIdField: JTextField
+  -outputArea: JTextArea
+  -uploadButton: JButton
+  -downloadButton: JButton
+  -getAllMessageIdsButton: JButton
+  -downloadSpecificButton: JButton
+  -logoffButton: JButton
+  -isLoggedIn: boolean
+  -helper: EchoClientHelper2
+  +EchoClient2()
+  -connectToServer(): void
+  -setActionButtonsEnabled(enabled: boolean): void
+  -login(): void
+  -uploadMessage(): void
+  -downloadMessages(): void
+  -getAllMessageIds(): void
+  -downloadSpecificMessage(): void
+  -logoff(): void
+  +main(args: String[]): void
+}
+
+' Define relationships
+EchoServer3 o--> "many" EchoServerThread : aggregates
+EchoServerThread *--> "many" Message : composes
+EchoClient2 --> EchoClientHelper2 : uses
+
+@enduml

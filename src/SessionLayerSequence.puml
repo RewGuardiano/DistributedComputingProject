@@ -1,0 +1,15 @@
+@startuml SessionLayerSequence
+
+participant "EchoClientHelper2" as EchoClientHelper2
+participant "MyStreamSocket" as MyStreamSocket
+participant "EchoServerThread" as EchoServerThread
+
+EchoClientHelper2 -> MyStreamSocket: sendMessage("LOGIN t00224519 mypassword")
+MyStreamSocket -> EchoServerThread: Writes message to socket output stream
+EchoServerThread -> EchoServerThread: Reads message using BufferedReader
+EchoServerThread -> EchoServerThread: Processes LOGIN request
+EchoServerThread -> MyStreamSocket: Writes "101 LOGIN SUCCESS" using PrintWriter
+MyStreamSocket -> EchoClientHelper2: receiveMessage() reads response
+EchoClientHelper2 -> EchoClientHelper2: Returns "101 LOGIN SUCCESS"
+
+@enduml

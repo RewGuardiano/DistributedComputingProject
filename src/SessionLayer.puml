@@ -1,0 +1,44 @@
+@startuml SessionLayer
+
+' Define classes
+class MyStreamSocket {
+  -socket: Socket
+  -input: BufferedReader
+  -output: PrintWriter
+  +MyStreamSocket(acceptorHost: InetAddress, acceptorPort: int)
+  +MyStreamSocket(socket: Socket)
+  -setStreams(): void
+  +sendMessage(message: String): void
+  +receiveMessage(): String
+  +close(): void
+}
+
+class EchoClientHelper2 {
+  -mySocket: MyStreamSocket
+  +EchoClientHelper2(hostName: String, portNum: String)
+  +sendRequest(message: String): String
+  +sendRequestMultiLine(message: String): String
+  -getSSLSocketFactory(): SSLSocketFactory
+  +done(): void
+}
+
+class EchoServerThread {
+  -clientSocket: Socket
+  -output: PrintWriter
+  -userMessages: ConcurrentHashMap<String, List<Message>>
+  -messageIdCounter: int
+  -isLoggedIn: boolean
+  +EchoServerThread(socket: Socket)
+  +run(): void
+  -handleClientRequest(message: String): void
+  -handleDownloadSpecific(messageId: String): void
+  -handleLogin(username: String, password: String): void
+  -handleUpload(message: String): void
+  -handleDownload(): void
+  -handleLogoff(): void
+}
+
+' Define relationships
+EchoClientHelper2 --> MyStreamSocket : uses
+
+@enduml

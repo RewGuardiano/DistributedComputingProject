@@ -1,0 +1,36 @@
+@startuml ApplicationLayerSequence
+
+participant "EchoClient2" as EchoClient2
+participant "EchoClientHelper2" as EchoClientHelper2
+participant "EchoServerThread" as EchoServerThread
+participant "EchoServer3" as EchoServer3
+
+EchoClient2 -> EchoClientHelper2: sendRequest("LOGIN t00224519 mypassword")
+EchoClientHelper2 -> EchoServerThread: LOGIN t00224519 mypassword
+EchoServerThread -> EchoServerThread: Sets isLoggedIn = true
+EchoServerThread -> EchoServerThread: Adds "anonymous" to userMessages
+EchoServerThread -> EchoClientHelper2: 101 LOGIN SUCCESS
+EchoClientHelper2 -> EchoClient2: Returns "101 LOGIN SUCCESS"
+
+EchoClient2 -> EchoClientHelper2: sendRequest("UPLOAD Hello!")
+EchoClientHelper2 -> EchoServerThread: UPLOAD Hello!
+EchoServerThread -> EchoServerThread: Creates Message("d0", "Hello!")
+EchoServerThread -> EchoServerThread: Adds Message to userMessages["anonymous"]
+EchoServerThread -> EchoClientHelper2: 201 UPLOAD SUCCESS (Message ID: d0)
+EchoClientHelper2 -> EchoClient2: Returns "201 UPLOAD SUCCESS (Message ID: d0)"
+
+EchoClient2 -> EchoClientHelper2: sendRequestMultiLine("DOWNLOAD")
+EchoClientHelper2 -> EchoServerThread: DOWNLOAD
+EchoServerThread -> EchoServerThread: Retrieves messages from userMessages["anonymous"]
+EchoServerThread -> EchoClientHelper2: 301 MESSAGE (ID: d0): Hello!
+EchoServerThread -> EchoClientHelper2: Message Downloaded
+EchoClientHelper2 -> EchoClient2: Returns messages
+
+EchoClient2 -> EchoClientHelper2: sendRequest("LOGOFF")
+EchoClientHelper2 -> EchoServerThread: LOGOFF
+EchoServerThread -> EchoServerThread: Sets isLoggedIn = false
+EchoServerThread -> EchoClientHelper2: 401 LOGOFF SUCCESS
+EchoClientHelper2 -> EchoClient2: Returns "401 LOGOFF SUCCESS"
+EchoClientHelper2 -> EchoClientHelper2: Calls done() to close connection
+
+@enduml

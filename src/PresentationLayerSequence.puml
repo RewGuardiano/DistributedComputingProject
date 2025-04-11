@@ -1,0 +1,34 @@
+@startuml PresentationLayerSequence
+
+actor User
+participant "EchoClient2 (GUI)" as EchoClient2
+participant "EchoServer3 (Console)" as EchoServer3
+
+User -> EchoClient2: Clicks "Login" button
+EchoClient2 -> User: Displays "Connected to SMP Server with SSL"
+EchoClient2 -> EchoServer3: LOGIN t00224519 mypassword
+EchoServer3 -> EchoClient2: 101 LOGIN SUCCESS
+EchoServer3 -> EchoServer3: Logs "New client connected via SSL"
+EchoClient2 -> User: Displays "101 LOGIN SUCCESS"
+EchoClient2 -> User: Enables action buttons
+
+User -> EchoClient2: Enters "Hello!" and clicks "Upload"
+EchoClient2 -> EchoServer3: UPLOAD Hello!
+EchoServer3 -> EchoClient2: 201 UPLOAD SUCCESS (Message ID: d0)
+EchoServer3 -> EchoServer3: Logs "Message received from client: d0, Hello!"
+EchoClient2 -> User: Displays "201 UPLOAD SUCCESS (Message ID: d0)"
+
+User -> EchoClient2: Clicks "Download"
+EchoClient2 -> EchoServer3: DOWNLOAD
+EchoServer3 -> EchoClient2: 301 MESSAGE (ID: d0): Hello!
+EchoServer3 -> EchoClient2: Message Downloaded
+EchoClient2 -> User: Displays messages
+
+User -> EchoClient2: Clicks "Logoff"
+EchoClient2 -> EchoServer3: LOGOFF
+EchoServer3 -> EchoClient2: 401 LOGOFF SUCCESS
+EchoServer3 -> EchoServer3: Logs "Client has logged off"
+EchoClient2 -> User: Displays "401 LOGOFF SUCCESS"
+EchoClient2 -> User: Disables action buttons
+
+@enduml

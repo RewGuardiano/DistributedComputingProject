@@ -148,9 +148,9 @@ public class EchoClient2 {
       }
       String messageId = messageIdField.getText();
       if (messageId.isEmpty()) {
-         outputArea.append("Please enter a message ID.\n");
-      } else if (!messageId.matches("d\\d+")) {
-         outputArea.append("Invalid message ID format. Expected format: d followed by a number (e.g., d0).\n");
+         outputArea.append("Error: Please enter a message ID.\n");
+      } if (!messageId.matches("d\\d+")) {
+         outputArea.append("Error: Invalid message ID format. Expected format: d followed by a number (e.g., d0).\n");
       } else {
          try {
             String response = helper.sendRequestMultiLine("DOWNLOAD_ID " + messageId);

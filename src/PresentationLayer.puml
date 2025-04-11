@@ -1,0 +1,37 @@
+@startuml PresentationLayer
+
+class EchoClient2 {
+  -usernameField: JTextField
+  -passwordField: JTextField
+  -messageField: JTextField
+  -messageIdField: JTextField
+  -outputArea: JTextArea
+  -uploadButton: JButton
+  -downloadButton: JButton
+  -getAllMessageIdsButton: JButton
+  -downloadSpecificButton: JButton
+  -logoffButton: JButton
+  -isLoggedIn: boolean
+  -helper: EchoClientHelper2
+  +EchoClient2()
+  -connectToServer(): void
+  -setActionButtonsEnabled(enabled: boolean): void
+  -login(): void
+  -uploadMessage(): void
+  -downloadMessages(): void
+  -getAllMessageIds(): void
+  -downloadSpecificMessage(): void
+  -logoff(): void
+  +main(args: String[]): void
+}
+
+class EchoServer3 {
+  -SERVER_PORT: int = 12345
+  +main(args: String[]): void
+  -getSSLServerSocketFactory(): SSLServerSocketFactory
+}
+
+' EchoClient2 and EchoServer3 don't have a direct relationship in the Presentation Layer
+' Their interaction is through the Application and Session Layers
+
+@enduml
